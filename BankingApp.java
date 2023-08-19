@@ -21,7 +21,10 @@ public class BankingApp {
         final String ERR_MSG = String.format("\t%s%s%s", COLOR_RED_BOLD,"%S",RESET);
         final String SUCCESS_MSG = String.format("\t%s%s%s", COLOR_GREEN_BOLD,"%s",RESET);
 
-        String[][] customerDetails = new String[0][];
+        // String[][] customerDetails = new String[0][];
+        String[][] customerDetails = {{"01234","lakith","25000"},
+                                       {"02237","rathnayake","2540"},
+                                    {"12345","rathnayake","4500"} };
         
         String screen = DASHBOARD;
 
@@ -66,22 +69,7 @@ public class BankingApp {
                     random = (int)Math.floor(Math.random()*10000);
                     System.out.printf("\tID:   SDB-%05d\n",random);
 
-                    do{
-                        valid = true;
-                        System.out.print("\n\tName: ");
-                        name = scanner.nextLine().strip();
-                        if(name.isBlank()){
-                            System.out.printf(ERR_MSG, "Account name can't be empty!\n");
-                            valid = false;
-                        }
-                        for (int i = 0; i < name.length(); i++) {
-                            if(!(Character.isLetter(name.charAt(i))||Character.isSpaceChar(name.charAt(i)))){
-                                System.out.printf(ERR_MSG, "Invalid user name\n");
-                                valid = false;
-                                break;
-                            }
-                        }
-                    }while(!valid);
+                    name = getUserInput("name");
 
                     do{
                         valid = true;
@@ -102,7 +90,7 @@ public class BankingApp {
                     for (int i = 0; i < customerDetails.length; i++) {
                         newCustomerDetails[i] = customerDetails[i];
                     }
-                    newCustomerDetails[newCustomerDetails.length - 1][0] = random+"";
+                    newCustomerDetails[newCustomerDetails.length - 1][0] = (random+"").length() == 5 ? (random+"") : "0".repeat(5-(random+"").length())+random;
                     newCustomerDetails[newCustomerDetails.length - 1][1] = name;
                     newCustomerDetails[newCustomerDetails.length - 1][2] = initialDepo+"";
 
@@ -113,7 +101,35 @@ public class BankingApp {
                     if(scanner.nextLine().strip().toUpperCase().equals("Y")) continue;
                     screen = DASHBOARD;
                     break;
+
+                case DEPOSIT_MONEY:
                     
+                    boolean valid2;
+                    double depoAmount;
+                    int value = checkAccountNumber(customerDetails,"value");
+
+                    System.out.printf("\tCurrent account balance: Rs: %s\n", customerDetails[value][2]);
+                    do{
+                        valid2 = true;
+                        System.out.print("\n\tDeposit amount: Rs. ");
+                        depoAmount = scanner.nextDouble();
+                        scanner.nextLine();
+                        if(depoAmount<500) {
+                            System.out.printf(ERR_MSG, "\n\tDeposit amount should be greater than Rs.500.00\n");
+                            System.out.print("\n\tDo you wish to continue(Y/n)? ");
+                            if(scanner.nextLine().strip().toUpperCase().equals("Y")) {valid2 = false;continue;}
+                            screen = DASHBOARD;
+                            break;
+                        }
+                    }while(!valid2);
+
+                    customerDetails[value][2] = (depoAmount + Double.parseDouble(customerDetails[value][2]))+"";
+
+                    System.out.printf("\tNew account balance: Rs: %s\n", customerDetails[value][2]);
+                    System.out.print("\n\tDo you want to continue(Y/n)? ");
+                    if(scanner.nextLine().strip().toUpperCase().equals("Y")) continue;
+                    screen = DASHBOARD;
+                    break;
 
                 default: System.exit(0);
             }
@@ -122,4 +138,86 @@ public class BankingApp {
 
 
     }
+
+    public static String getUserInput(String input) {
+        boolean valid;
+        String value;
+
+        do{
+            valid = true;
+            System.out.print("\n\tName: ");
+            value = scanner.nextLine().strip();
+            if(value.isBlank()){
+                System.out.printf(returnStatus("ERR_MSG"), "Account name can't be empty!\n");
+                valid = false;
+            }
+            for (int i = 0; i < value.length(); i++) {
+                if(!(Character.isLetter(value.charAt(i))||Character.isSpaceChar(value.charAt(i)))){
+                    System.out.printf(returnStatus("ERR_MSG"), "Invalid user name\n");
+                    valid = false;
+                    break;
+                }
+            }
+            
+        }while(!valid);
+
+        return value;
+    } 
+
+    public static String returnStatus(String input){
+
+        String value = "";
+        final String CLEAR = "\033[H\033[2J";
+        final String COLOR_BLUE_BOLD = "\033[34;1m";
+        final String COLOR_RED_BOLD = "\033[31;1m";
+        final String COLOR_GREEN_BOLD = "\033[32;1m";
+        final String RESET = "\033[0m";
+
+        final String ERR_MSG = String.format("\t%s%s%s", COLOR_RED_BOLD,"%S",RESET);
+        final String SUCCESS_MSG = String.format("\t%s%s%s", COLOR_GREEN_BOLD,"%s",RESET);
+
+        if(input.equals("ERR_MSG")) value = ERR_MSG;
+        else if(input.equals("SUCCESS_MSG")) value =  SUCCESS_MSG;
+        return value;
+    }
+
+    public static int checkAccountNumber(String[][] array,String input) {
+        boolean valid;
+        String value;
+        int j;
+
+        loop:
+        do{
+            j = 0;
+            valid = true;
+            System.out.print("\n\tEnter A/C No: ");
+            value = scanner.nextLine().strip();
+            if(value.isBlank()){
+                System.out.printf(returnStatus("ERR_MSG"), "A/C No can't be empty!\n");
+                valid = false;
+            }
+            else if(!(value.startsWith("SDB-") && value.length() == 9)){
+                System.out.printf(returnStatus("ERR_MSG"),"Invalid format\n");
+                valid = false;
+            }
+            else if(valid==true){
+                for (int i = j; i < array.length; i++) {
+                    if(array[i][0].equals(value.substring(4))){
+                        // System.out.println("Found");
+                        valid = true;
+                        j = i;
+                        break loop;
+                    }
+                }
+                System.out.printf(returnStatus("ERR_MSG"), "A/C No is not found!\n");
+                valid = false;
+            }
+            
+
+        }while(!valid);
+
+        return j;
+    }
+
+   
 }
