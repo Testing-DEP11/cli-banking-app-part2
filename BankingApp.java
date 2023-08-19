@@ -12,13 +12,13 @@ public class BankingApp {
         
         final String DASHBOARD = "💰 Welcome to Smart Banking App"; 
         final String NEW_ACCOUNT = "➕ Open New Account";
-        final String DEPOSIT_MONEY = "Deposit Money";
-        final String WITHDRAW_MONEY = "Withdraw Money";
-        final String TRANSFER_MONEY = "Trasnfer Money";
-        final String ACCOUNT_BALANCE = "Check Account Balance";
-        final String DELETE_ACCOUNT = "Drop Existing Account";
+        final String DEPOSIT_MONEY = "📥 Deposit Money";
+        final String WITHDRAW_MONEY = "📤 Withdraw Money";
+        final String TRANSFER_MONEY = "💸 Trasnfer Money";
+        final String ACCOUNT_BALANCE = "🖨 Check Account Balance";
+        final String DELETE_ACCOUNT = "❌ Drop Existing Account";
 
-        final String ERR_MSG = String.format("\t%s%s%s", COLOR_RED_BOLD,"%S",RESET);
+        final String ERR_MSG = String.format("\t%s%s%s", COLOR_RED_BOLD,"%s",RESET);
         final String SUCCESS_MSG = String.format("\t%s%s%s", COLOR_GREEN_BOLD,"%s",RESET);
 
         // String[][] customerDetails = new String[0][];
@@ -130,6 +130,39 @@ public class BankingApp {
                     if(scanner.nextLine().strip().toUpperCase().equals("Y")) continue;
                     screen = DASHBOARD;
                     break;
+
+                case WITHDRAW_MONEY:
+                    boolean valid3;
+                    double withdraw;
+                    int withIndex = checkAccountNumber(customerDetails,"value");
+                    System.out.printf("\tCurrent account balance: Rs: %s\n", customerDetails[withIndex][2]);
+                    do{
+                        valid3 = true;
+                        System.out.print("\n\tWithdraw amount: Rs. ");
+                        withdraw = scanner.nextDouble();
+                        scanner.nextLine();
+                        if(withdraw<100) {
+                            System.out.printf(ERR_MSG, "\n\tWithdraw amount can't be less than Rs.100.00\n");
+                            System.out.print("\n\tDo you wish to continue(Y/n)? ");
+                            if(scanner.nextLine().strip().toUpperCase().equals("Y")) {valid3 = false;continue;}
+                            screen = DASHBOARD;
+                            break;
+                        } else if(Double.parseDouble(customerDetails[withIndex][2]) - withdraw < 500){
+                            System.out.printf(ERR_MSG, "\n\tShould maintain minimum ammount of Rs.500.00 at the account\n");
+                            System.out.print("\n\tDo you wish to continue(Y/n)? ");
+                            if(scanner.nextLine().strip().toUpperCase().equals("Y")) {valid3 = false;continue;}
+                            screen = DASHBOARD;
+                            break;
+                        }
+
+                    }while(!valid3);
+                    customerDetails[withIndex][2] = (Double.parseDouble(customerDetails[withIndex][2]) - withdraw)+"";
+                    System.out.printf("\tNew account balance: Rs: %s\n", customerDetails[withIndex][2]);
+                    System.out.print("\n\tDo you want to continue(Y/n)? ");
+                    if(scanner.nextLine().strip().toUpperCase().equals("Y")) continue;
+                    screen = DASHBOARD;
+                    break;
+
 
                 default: System.exit(0);
             }
