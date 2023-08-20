@@ -18,10 +18,7 @@ public class BankingApp {
         final String DELETE_ACCOUNT = "❌ Drop Existing Account";
 
 
-        // String[][] customerDetails = new String[0][];
-        String[][] customerDetails = {{"01234","lakith","25000"},
-                                       {"02237","rathnayake","2540"},
-                                    {"12345","rathnayake","4500"} };
+        String[][] customerDetails = new String[0][];
         
         String screen = DASHBOARD;
 
@@ -93,7 +90,7 @@ public class BankingApp {
 
                     customerDetails = newCustomerDetails;
 
-                    System.out.printf(returnStatus("SUCCESS_MSG"), String.format("\n\tID:SDB-%05d, %s has been created sucessfully!\n", random, name));
+                    System.out.printf(returnStatus("SUCCESS_MSG"), String.format("\n\tID:SDB-%05d, %s has been created successfully!\n", random, name));
                     System.out.print("\n\tDo you want to continue(Y/n)? ");
                     if(scanner.nextLine().strip().toUpperCase().equals("Y")) continue;
                     screen = DASHBOARD;
@@ -215,22 +212,26 @@ public class BankingApp {
                 case DELETE_ACCOUNT:
                     
                     int deleteAcc = checkAccountNumber(customerDetails, "Delete");
-                    String idDeleted = customerDetails[deleteAcc][0];
-                    String nameDeleted = customerDetails[deleteAcc][1];
-                    String [][] deleteCustomers = new String[customerDetails.length-1][];
-                    for (int i = 0; i < customerDetails.length; i++) {
-                        if(i < deleteAcc){
-                            deleteCustomers[i] = customerDetails[i];
-                        } else if (deleteAcc == i) continue;
-                        else{
-                            deleteCustomers[i-1] = customerDetails[i];
+                    System.out.print("\n\tAre you sure you want to delete the account(Y/n)? ");
+                    if(scanner.nextLine().strip().toUpperCase().equals("Y")){
+                        String idDeleted = customerDetails[deleteAcc][0];
+                        String nameDeleted = customerDetails[deleteAcc][1];
+                        String [][] deleteCustomers = new String[customerDetails.length-1][];
+                        for (int i = 0; i < customerDetails.length; i++) {
+                            if(i < deleteAcc){
+                                deleteCustomers[i] = customerDetails[i];
+                            } else if (deleteAcc == i) continue;
+                            else{
+                                deleteCustomers[i-1] = customerDetails[i];
+                            }
                         }
-                    }
-                    customerDetails = deleteCustomers;
+                        customerDetails = deleteCustomers;
 
-                    System.out.printf(returnStatus("SUCCESS_MSG"), String.format("\n\tID:SDB-%s, %s has been deleted sucessfully!\n", idDeleted, nameDeleted));
-                    System.out.print("\n\tDo you want to continue(Y/n)? ");
-                    if(scanner.nextLine().strip().toUpperCase().equals("Y")) continue;
+                        System.out.printf(returnStatus("SUCCESS_MSG"), String.format("\n\tID:SDB-%s, %s has been deleted successfully!\n", idDeleted, nameDeleted));
+                        System.out.print("\n\tDo you want to continue(Y/n)? ");
+                        if(scanner.nextLine().strip().toUpperCase().equals("Y")) continue;
+                        screen = DASHBOARD;
+                    } 
                     screen = DASHBOARD;
                     break;
 
