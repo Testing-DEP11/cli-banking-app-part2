@@ -205,6 +205,16 @@ public class BankingApp {
                     screen = DASHBOARD;
                     break;
 
+                case ACCOUNT_BALANCE:
+                    
+                    int accBalance = checkAccountNumber(customerDetails, "\b");
+                    System.out.printf("\tName: %s\n", customerDetails[accBalance][1]);
+                    System.out.printf("\tCurrent Account Balance - Rs: %s\n", customerDetails[accBalance][2]);
+                    System.out.printf("\tAvailable Balance to withdraw - Rs: %s\n", (Double.parseDouble(customerDetails[accBalance][2])-500) + "");
+                    System.out.print("\n\tDo you want to continue(Y/n)? ");
+                    if(scanner.nextLine().strip().toUpperCase().equals("Y")) continue;
+                    screen = DASHBOARD;
+                    break;
 
                 default: System.exit(0);
             }
