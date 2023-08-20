@@ -1,3 +1,4 @@
+import java.util.Arrays;
 import java.util.Scanner;
 
 public class BankingApp {
@@ -6,8 +7,6 @@ public class BankingApp {
         
         final String CLEAR = "\033[H\033[2J";
         final String COLOR_BLUE_BOLD = "\033[34;1m";
-        final String COLOR_RED_BOLD = "\033[31;1m";
-        final String COLOR_GREEN_BOLD = "\033[32;1m";
         final String RESET = "\033[0m";
         
         final String DASHBOARD = "💰 Welcome to Smart Banking App"; 
@@ -15,11 +14,9 @@ public class BankingApp {
         final String DEPOSIT_MONEY = "📥 Deposit Money";
         final String WITHDRAW_MONEY = "📤 Withdraw Money";
         final String TRANSFER_MONEY = "💸 Trasnfer Money";
-        final String ACCOUNT_BALANCE = "🖨 Check Account Balance";
+        final String ACCOUNT_BALANCE = "🖨  Check Account Balance";
         final String DELETE_ACCOUNT = "❌ Drop Existing Account";
 
-        final String ERR_MSG = String.format("\t%s%s%s", COLOR_RED_BOLD,"%s",RESET);
-        final String SUCCESS_MSG = String.format("\t%s%s%s", COLOR_GREEN_BOLD,"%s",RESET);
 
         // String[][] customerDetails = new String[0][];
         String[][] customerDetails = {{"01234","lakith","25000"},
@@ -77,7 +74,7 @@ public class BankingApp {
                         initialDepo = scanner.nextDouble();
                         scanner.nextLine();
                         if(initialDepo<5000) {
-                            System.out.printf(ERR_MSG, "\n\tInitial deposit should be greater than Rs:5000.00\n");
+                            System.out.printf(returnStatus("ERR_MSG"), "\n\tInitial deposit should be greater than Rs:5000.00\n");
                             System.out.print("\n\tDo you wish to continue(Y/n)? ");
                             if(scanner.nextLine().strip().toUpperCase().equals("Y")) {valid = false;continue;}
                             screen = DASHBOARD;
@@ -97,7 +94,6 @@ public class BankingApp {
                     customerDetails = newCustomerDetails;
 
                     System.out.printf(returnStatus("SUCCESS_MSG"), String.format("\n\tID:SDB-%05d, %s has been created sucessfully!\n", random, name));
-                    // System.out.printf(SUCCESS_MSG, String.format("\n\tID:SDB-%05d, %s has been created sucessfully!\n", random, name));
                     System.out.print("\n\tDo you want to continue(Y/n)? ");
                     if(scanner.nextLine().strip().toUpperCase().equals("Y")) continue;
                     screen = DASHBOARD;
@@ -116,7 +112,7 @@ public class BankingApp {
                         depoAmount = scanner.nextDouble();
                         scanner.nextLine();
                         if(depoAmount<500) {
-                            System.out.printf(ERR_MSG, "\n\tDeposit amount should be greater than Rs:500.00\n");
+                            System.out.printf(returnStatus("ERR_MSG"), "\n\tDeposit amount should be greater than Rs:500.00\n");
                             System.out.print("\n\tDo you wish to continue(Y/n)? ");
                             if(scanner.nextLine().strip().toUpperCase().equals("Y")) {valid2 = false;continue;}
                             screen = DASHBOARD;
@@ -143,13 +139,13 @@ public class BankingApp {
                         withdraw = scanner.nextDouble();
                         scanner.nextLine();
                         if(withdraw<100) {
-                            System.out.printf(ERR_MSG, "\n\tWithdraw amount can't be less than Rs:100.00\n");
+                            System.out.printf(returnStatus("ERR_MSG"), "\n\tWithdraw amount can't be less than Rs:100.00\n");
                             System.out.print("\n\tDo you wish to continue(Y/n)? ");
                             if(scanner.nextLine().strip().toUpperCase().equals("Y")) {valid3 = false;continue;}
                             screen = DASHBOARD;
                             break;
                         } else if(Double.parseDouble(customerDetails[withIndex][2]) - withdraw < 500){
-                            System.out.printf(ERR_MSG, "\n\tShould maintain minimum ammount of Rs.500.00 at the account\n");
+                            System.out.printf(returnStatus("ERR_MSG"), "\n\tShould maintain minimum ammount of Rs.500.00 at the account\n");
                             System.out.print("\n\tDo you wish to continue(Y/n)? ");
                             if(scanner.nextLine().strip().toUpperCase().equals("Y")) {valid3 = false;continue;}
                             screen = DASHBOARD;
@@ -181,13 +177,13 @@ public class BankingApp {
                         trasfer = scanner.nextDouble();
                         scanner.nextLine();
                         if(trasfer<100) {
-                            System.out.printf(ERR_MSG, "\n\tTransfer amount can't be less than Rs:100.00\n");
+                            System.out.printf(returnStatus("ERR_MSG"), "\n\tTransfer amount can't be less than Rs:100.00\n");
                             System.out.print("\n\tDo you wish to continue(Y/n)? ");
                             if(scanner.nextLine().strip().toUpperCase().equals("Y")) {valid4 = false;continue;}
                             screen = DASHBOARD;
                             break;
                         } else if(Double.parseDouble(customerDetails[fromAcc][2]) - trasfer < 500){
-                            System.out.printf(ERR_MSG, "\n\tShould maintain minimum ammount of Rs.500.00 at the account\n");
+                            System.out.printf(returnStatus("ERR_MSG"), "\n\tShould maintain minimum ammount of Rs.500.00 at the account\n");
                             System.out.print("\n\tDo you wish to continue(Y/n)? ");
                             if(scanner.nextLine().strip().toUpperCase().equals("Y")) {valid4 = false;continue;}
                             screen = DASHBOARD;
@@ -215,6 +211,29 @@ public class BankingApp {
                     if(scanner.nextLine().strip().toUpperCase().equals("Y")) continue;
                     screen = DASHBOARD;
                     break;
+
+                case DELETE_ACCOUNT:
+                    
+                    int deleteAcc = checkAccountNumber(customerDetails, "Delete");
+                    String idDeleted = customerDetails[deleteAcc][0];
+                    String nameDeleted = customerDetails[deleteAcc][1];
+                    String [][] deleteCustomers = new String[customerDetails.length-1][];
+                    for (int i = 0; i < customerDetails.length; i++) {
+                        if(i < deleteAcc){
+                            deleteCustomers[i] = customerDetails[i];
+                        } else if (deleteAcc == i) continue;
+                        else{
+                            deleteCustomers[i-1] = customerDetails[i];
+                        }
+                    }
+                    customerDetails = deleteCustomers;
+
+                    System.out.printf(returnStatus("SUCCESS_MSG"), String.format("\n\tID:SDB-%s, %s has been deleted sucessfully!\n", idDeleted, nameDeleted));
+                    System.out.print("\n\tDo you want to continue(Y/n)? ");
+                    if(scanner.nextLine().strip().toUpperCase().equals("Y")) continue;
+                    screen = DASHBOARD;
+                    break;
+
 
                 default: System.exit(0);
             }
@@ -252,13 +271,11 @@ public class BankingApp {
     public static String returnStatus(String input){
 
         String value = "";
-        final String CLEAR = "\033[H\033[2J";
-        final String COLOR_BLUE_BOLD = "\033[34;1m";
         final String COLOR_RED_BOLD = "\033[31;1m";
         final String COLOR_GREEN_BOLD = "\033[32;1m";
         final String RESET = "\033[0m";
 
-        final String ERR_MSG = String.format("\t%s%s%s", COLOR_RED_BOLD,"%S",RESET);
+        final String ERR_MSG = String.format("\t%s%s%s", COLOR_RED_BOLD,"%s",RESET);
         final String SUCCESS_MSG = String.format("\t%s%s%s", COLOR_GREEN_BOLD,"%s",RESET);
 
         if(input.equals("ERR_MSG")) value = ERR_MSG;
