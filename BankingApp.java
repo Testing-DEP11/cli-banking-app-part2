@@ -73,11 +73,11 @@ public class BankingApp {
 
                     do{
                         valid = true;
-                        System.out.print("\n\tInitial Deposit: Rs. ");
+                        System.out.print("\n\tInitial Deposit: Rs: ");
                         initialDepo = scanner.nextDouble();
                         scanner.nextLine();
                         if(initialDepo<5000) {
-                            System.out.printf(ERR_MSG, "\n\tInitial deposit should be greater than Rs.5000.00\n");
+                            System.out.printf(ERR_MSG, "\n\tInitial deposit should be greater than Rs:5000.00\n");
                             System.out.print("\n\tDo you wish to continue(Y/n)? ");
                             if(scanner.nextLine().strip().toUpperCase().equals("Y")) {valid = false;continue;}
                             screen = DASHBOARD;
@@ -96,7 +96,8 @@ public class BankingApp {
 
                     customerDetails = newCustomerDetails;
 
-                    System.out.printf(SUCCESS_MSG, String.format("\n\tID:SDB-%05d, %s has been created sucessfully!\n", random, name));
+                    System.out.printf(returnStatus("SUCCESS_MSG"), String.format("\n\tID:SDB-%05d, %s has been created sucessfully!\n", random, name));
+                    // System.out.printf(SUCCESS_MSG, String.format("\n\tID:SDB-%05d, %s has been created sucessfully!\n", random, name));
                     System.out.print("\n\tDo you want to continue(Y/n)? ");
                     if(scanner.nextLine().strip().toUpperCase().equals("Y")) continue;
                     screen = DASHBOARD;
@@ -106,16 +107,16 @@ public class BankingApp {
                     
                     boolean valid2;
                     double depoAmount;
-                    int value = checkAccountNumber(customerDetails,"value");
+                    int value = checkAccountNumber(customerDetails, "Deposit");
 
                     System.out.printf("\tCurrent account balance: Rs: %s\n", customerDetails[value][2]);
                     do{
                         valid2 = true;
-                        System.out.print("\n\tDeposit amount: Rs. ");
+                        System.out.print("\n\tDeposit amount: Rs: ");
                         depoAmount = scanner.nextDouble();
                         scanner.nextLine();
                         if(depoAmount<500) {
-                            System.out.printf(ERR_MSG, "\n\tDeposit amount should be greater than Rs.500.00\n");
+                            System.out.printf(ERR_MSG, "\n\tDeposit amount should be greater than Rs:500.00\n");
                             System.out.print("\n\tDo you wish to continue(Y/n)? ");
                             if(scanner.nextLine().strip().toUpperCase().equals("Y")) {valid2 = false;continue;}
                             screen = DASHBOARD;
@@ -134,15 +135,15 @@ public class BankingApp {
                 case WITHDRAW_MONEY:
                     boolean valid3;
                     double withdraw;
-                    int withIndex = checkAccountNumber(customerDetails,"value");
+                    int withIndex = checkAccountNumber(customerDetails, "Withdraw");
                     System.out.printf("\tCurrent account balance: Rs: %s\n", customerDetails[withIndex][2]);
                     do{
                         valid3 = true;
-                        System.out.print("\n\tWithdraw amount: Rs. ");
+                        System.out.print("\n\tWithdraw amount: Rs: ");
                         withdraw = scanner.nextDouble();
                         scanner.nextLine();
                         if(withdraw<100) {
-                            System.out.printf(ERR_MSG, "\n\tWithdraw amount can't be less than Rs.100.00\n");
+                            System.out.printf(ERR_MSG, "\n\tWithdraw amount can't be less than Rs:100.00\n");
                             System.out.print("\n\tDo you wish to continue(Y/n)? ");
                             if(scanner.nextLine().strip().toUpperCase().equals("Y")) {valid3 = false;continue;}
                             screen = DASHBOARD;
@@ -158,6 +159,47 @@ public class BankingApp {
                     }while(!valid3);
                     customerDetails[withIndex][2] = (Double.parseDouble(customerDetails[withIndex][2]) - withdraw)+"";
                     System.out.printf("\tNew account balance: Rs: %s\n", customerDetails[withIndex][2]);
+                    System.out.print("\n\tDo you want to continue(Y/n)? ");
+                    if(scanner.nextLine().strip().toUpperCase().equals("Y")) continue;
+                    screen = DASHBOARD;
+                    break;
+
+                case TRANSFER_MONEY:
+                    
+                    int fromAcc = checkAccountNumber(customerDetails, "From");
+                    int toAcc = checkAccountNumber(customerDetails, "To");
+
+                    System.out.printf("\n\tCurrent account balance of From Account: Rs: %s\n", customerDetails[fromAcc][2]);
+                    System.out.printf("\tCurrent account balance of To Account: Rs: %s\n", customerDetails[toAcc][2]);
+
+                    boolean valid4;
+                    double trasfer;
+
+                    do{
+                        valid4 = true;
+                        System.out.print("\n\tTrasfer amount: Rs: ");
+                        trasfer = scanner.nextDouble();
+                        scanner.nextLine();
+                        if(trasfer<100) {
+                            System.out.printf(ERR_MSG, "\n\tTransfer amount can't be less than Rs:100.00\n");
+                            System.out.print("\n\tDo you wish to continue(Y/n)? ");
+                            if(scanner.nextLine().strip().toUpperCase().equals("Y")) {valid4 = false;continue;}
+                            screen = DASHBOARD;
+                            break;
+                        } else if(Double.parseDouble(customerDetails[fromAcc][2]) - trasfer < 500){
+                            System.out.printf(ERR_MSG, "\n\tShould maintain minimum ammount of Rs.500.00 at the account\n");
+                            System.out.print("\n\tDo you wish to continue(Y/n)? ");
+                            if(scanner.nextLine().strip().toUpperCase().equals("Y")) {valid4 = false;continue;}
+                            screen = DASHBOARD;
+                            break;
+                        }
+
+                    }while(!valid4);
+
+                    customerDetails[toAcc][2] = (Double.parseDouble(customerDetails[toAcc][2]) + trasfer)+"";
+                    customerDetails[fromAcc][2] = (Double.parseDouble(customerDetails[fromAcc][2]) - trasfer * 1.02)+"";
+                    System.out.printf("\tNew From Account balance: Rs: %s\n", customerDetails[fromAcc][2]);
+                    System.out.printf("\tNew To Account balance: Rs: %s\n", customerDetails[toAcc][2]);
                     System.out.print("\n\tDo you want to continue(Y/n)? ");
                     if(scanner.nextLine().strip().toUpperCase().equals("Y")) continue;
                     screen = DASHBOARD;
@@ -214,7 +256,7 @@ public class BankingApp {
         return value;
     }
 
-    public static int checkAccountNumber(String[][] array,String input) {
+    public static int checkAccountNumber(String[][] array, String name) {
         boolean valid;
         String value;
         int j;
@@ -223,7 +265,7 @@ public class BankingApp {
         do{
             j = 0;
             valid = true;
-            System.out.print("\n\tEnter A/C No: ");
+            System.out.printf("\n\tEnter %s A/C No: ", name);
             value = scanner.nextLine().strip();
             if(value.isBlank()){
                 System.out.printf(returnStatus("ERR_MSG"), "A/C No can't be empty!\n");
